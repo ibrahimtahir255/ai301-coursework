@@ -15,15 +15,11 @@ label is not graded.
 
 **Pull request**
 
-[Link to the pull request you opened. It must be the pull request's own page on the Path
-Review repo, not your fork's branch page.]
+https://github.com/codepath/pathreview-ai301-fa26-s1/pull/166
 
 **Branch**
 
-[The name of the branch the pull request comes from, exactly as it appears in your fork.
-The naming shape is a type prefix, then the issue number, then a short description. **The
-issue number in the branch name must be the number of the issue the pull request fixes** —
-a name carrying any other number does not satisfy this field.]
+fix/72-verify-password-unknown-hash
 
 ## Eval iterations
 
@@ -32,28 +28,33 @@ fields.
 
 **Run history**
 
-[The agreement score of each run you did, in order. A single run is a complete answer if
-only one run occurred. **The last score in your list must match the agreement line in the
-`eval-run.txt` you committed** — that file is the record of your final run.]
+1. Full run (20 packages): `agreement: 13/20 scored items  (bar: 18/20: below the bar; category floor unmet: no match in clear-accept)`. My tool rejected all 20 packages, including all 7 clear-accepts.
+2. Partial run with `--only` (7 clear-accepts that disagreed, plus canaries pkg-01, pkg-04, pkg-10, calib-01, calib-03): `agreement: 4/10 scored items`. Partial runs don't decide the bar.
+3. Full run (20 packages), saved as `eval-run.txt`: `agreement: 19/20 scored items  (bar: 18/20: PASS)`.
 
 **Package analysis**
 
-[Pick one scored package (`pkg-01` through `pkg-20` — the four `calib-` packages are never
-scored). Name it by id, say what your rubric decided and what the gold label said, and
-explain why your rubric read it that way.]
+`pkg-02` (Textualize/rich#4208, `Console.save_text` clears the recording when the file write fails). Gold label: `accept`.
+ 
+In my first full run, my rubric decided `reject`, failing only `test-plan-run`. At that point the check required every automated test-plan item to have "its command and real printed output". The plan's test plan said "run pytest", and the package only reported it in a sentence: "`pytest tests/ -q` passes (1462 passed, 12 skipped)". The plan item "a successful save still clears" also had no separate command, because it is checked by the new test in the diff: `assert console.export_text(clear=False) == ""`. My rubric read the sentence as a claim without proof, the same way the class worksheet treated "the full format suite pass" in calib-03.
+ 
+A maintainer would accept pkg-02: the pass/fail counts are specific and checkable, and the second item is a real test in the diff that the pytest run covers. calib-03 only said "pass" with no counts, and its control test was not in the diff. So I changed the check to accept a named command with a specific result, and to count a plan item as tested when a test added in the diff checks it. In my final run (`eval-run.txt`), my rubric decided `accept` for pkg-02, matching gold.
 
 **Check rationale**
 
-[Quote one check from the `rubric.md` you uploaded to `tools/pr-precheck/`, exactly as it reads now.
-Then say why it reads that way — what you revised to get there, or what you rejected in
-favour of it.]
+From `rubric.md`, check `test-plan-run`:
+
+"Every item in the plan's test plan is reported with its command or steps named and its outcome stated: real output, a result such as pass/fail counts, "passes", or "unchanged", or a specific observed result. A test added in the diff that checks an item counts for that item when the suite that runs it is reported. Any item that failed or was not run is honestly reported with the reason. Fails when a planned item is missing from the evidence, is reported with no command or steps named, or is dismissed ("no further testing seemed necessary")."
+
+It reads this way because my first version was too strict. It required "its command and real printed output" for every automated test, which matched the class worksheet, where a sentence like "tests pass" was never proof. That version failed `test-plan-run` on all 7 clear-accept packages. Looking at the evidence lines, the good PRs did test their changes; they just reported some results as a named command with an outcome instead of pasted output (pkg-02: "passes (1462 passed, 12 skipped)", pkg-16: "`go test ./pkg/minikube/machine/... ./cmd/...` passes"). The not-tested PRs were different: they named no command at all (pkg-04: only "colors work now in paging mode") or skipped testing (pkg-10: "no further testing seemed necessary"). So I rejected "every item needs pasted output" in favour of "every item is named with its outcome", and kept the fail cases for items that are missing, unnamed, or dismissed.
 
 **Trade-offs**
 
-[Every check gives something up. Any one of these is a complete answer: a package whose
-result it changes, a canary you re-ran with `--only`, a case you accept it will miss, or a
-stated reason nothing changed elsewhere. "Nothing changed, and here is how I know" earns
-the point in full when the reason follows.]
+The check now accepts a bare "passes" for a named command, so it gives up catching a PR that names a test suite and claims it passed without really running it. I accept that miss, because the gold labels accept named results like pkg-16's "`go test ./pkg/minikube/machine/... ./cmd/...` passes", and a bare claim that also hides a missing test is still caught by `plan-delivered`.
+ 
+To check that loosening it didn't let bad PRs through, I re-ran canaries with `--only` after the first change: pkg-04 and pkg-10 (not-tested), pkg-01 (standards-wall), and calib-03 all stayed `reject`. The final full run kept `not-tested 4/4` and `standards-wall 2/2`.
+ 
+It also still misses one package I accept it will miss: pkg-19 (gold `accept`) is rejected on `test-plan-run`, because its controls are reported only as "unchanged" with no command or steps named. Loosening further to pass pkg-19 would mean accepting test results with no command at all, which is exactly what makes pkg-04 not-tested.
 
 ---
 
