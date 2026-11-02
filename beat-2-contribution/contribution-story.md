@@ -8,9 +8,8 @@ format criteria grade exactly that. Your course repo link is the whole submissio
 files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
-**Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
+**Student:** Ibrahim Tahir
+**GitHub Username:** ibrahimtahir255
 **Issue:** [GitHub issue link]
 **Pull Request:** [GitHub PR link, once opened]
 
@@ -55,10 +54,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: Built issue-scout, then fixed its search strategy and rubric after two scans and one grading run (2026-10-25 to 2026-11-01)**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I installed issue-scout over my unit 1 rubric and wrote a search strategy from my fit profile: five queries (AI/ML Python first, then Python, Java, and React) and eight ranking rules. My first scan accepted five issues from tiny repos (0–14 stars) because the keyword "pytorch" matched any repo, and after I limited query 1 to big ML organisations, my second scan rejected all five because they already had open PRs or claims that ranking couldn't see. I fixed this by adding `-linked:pr` to my queries (it removed 115 of 290 results before the paid grading step), counting any claim from the last 60 days as taken, skipping issues under 7 days old, and adding `scope-fits` rules against from-scratch builds and no-code tasks. Grading my Issue Selection picks showed the scout accepted Rust and Fortran issues without noticing they didn't fit me, so I added a preferred `language-fit` check, and I let open PRs untouched for 180+ days pass so stale work doesn't block me.
 
 **Unit 6: [one line on the tool work]**
 
