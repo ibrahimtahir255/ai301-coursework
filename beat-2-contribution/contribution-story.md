@@ -95,27 +95,31 @@ This issue fits me because it is a small bug in a Vue and TypeScript web app, an
 
 **Problem Description**
 
-[In your own words, what is broken or missing?]
+In VueTorrent's Add Torrent dialog, with Automatic Torrent Management off, I can type my own save path. If I then change the category, the dialog replaces my path with the category's save path, or with the default path when I clear the category. The path I typed is lost without any warning.
+
 
 **Expected Behavior**
 
-[What should happen?]
+The issue asks that, with Automatic Torrent Management off, the save path I typed stays the same when I change the category. The maintainer disagrees in part: he says that when a category has its own save path, manual mode assumes I want that path. So it is not decided whether changing the category should overwrite a path I typed. I asked the maintainer in my claim comment, and he has not answered yet.
 
 **Current Behavior**
 
-[What actually happens?]
+On v2.36.1 (commit eba5162), using the mock backend: category Movie gives /bin. After I type /downloads/special, switching the category to Music changes the path to /usr/local/src, and clearing the category changes it to /downloads. PR #1999 only fixed the case where a category has an empty save path.
+
 
 **Affected Components**
 
-[Which parts of the codebase are involved?]
+- `src/components/Dialogs/AddTorrentParamsForm.vue`: `onCategoryChanged()` (lines 98-105) and the category combobox's `@update:model-value` (line 155). The save path field is only disabled with `:disabled="form.use_auto_tmm"`.
+- `src/stores/addTorrents.ts`: holds `addTorrentParams.save_path` and `use_auto_tmm`.
+- `src/components/Dialogs/AddTorrentDialog.vue`: sends them as `savepath` and `autoTMM`.
+- The preference `use_category_paths_in_manual_mode` (Settings, Downloads) exists, but the add dialog does not read it.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
-
+- Tool: Claude, in a session linked to my VueTorrent clone. I gave it the issue link and my CLAUDE.local.md, and it read the issue thread and the code (AddTorrentParamsForm.vue, addTorrents.ts, AddTorrentDialog.vue), then drafted the four answers.
+- What it produced: A draft of Problem Description, Expected Behavior, Current Behavior, and Affected Components. It confirmed that onCategoryChanged() never reads use_auto_tmm, and it pointed out that the maintainer's view in the thread differs from the reporter's.
+- Difficulties: Its page fetch of the issue did not show comment dates or my claim comment, so it could not tell whether the maintainer had answered my question. I checked the thread myself, and he has not replied yet.
+- What changed: I edited Claude's draft where it was unclear and checked that it was accurate, direct, and on topic. I reworded Expected Behavior to say plainly that the maintainer's view is still an open question.
 ---
 
 ## Reproduction Process
@@ -165,29 +169,59 @@ I ran this on macOS 26.3.1 with Google Chrome 156.0.8078.73 (arm64), Node v26.7.
 
 **Analysis**
 
-[Your analysis of the root cause: what is causing the issue, traced
-to the files and functions involved.]
+The bug is in `onCategoryChanged()` in `src/components/Dialogs/AddTorrentParamsForm.vue` (lines 98-105). It is the handler for the category combobox's `@update:model-value` event (line 155), so it runs every time the category changes. It does two things:
+
+- If the new category has a save path, it sets `form.value.save_path` to that path.
+- If there is no category (the user cleared it), it sets `form.value.save_path` to the default save path from the preferences.
+
+It never reads `form.value.use_auto_tmm`, and it has no way to tell whether the user typed the current path or whether it was filled in automatically. So in manual mode, any category change overwrites a path the user typed.
+
+The save path field (`ServerPathField`, `v-model="form.save_path"`, lines 187-191) is only disabled when `use_auto_tmm` is on. With it off, the user can type, and nothing protects what they type.
+
+The form's initial values come from `loadAddTorrentOptions()` in `src/stores/addTorrents.ts`, which sets `save_path` to the default and clears the category. `AddTorrentDialog.vue` then sends `save_path` as `savepath` and `use_auto_tmm` as `autoTMM`, so whatever ends up in the field is what qBittorrent receives.
+
+PR #1999 added the `category.savePath.length > 0` check, so a category with an empty save path no longer overwrites the field. That is the only case it fixed. Clearing the category still overwrites the field.
+
+I reproduced this on v2.36.1 (commit eba5162, master) in mock mode with `VITE_USE_MOCK_PROVIDER=true npm run dev`. With Automatic Torrent Management unchecked, category Movie gave /bin. I typed /downloads/special, changed the category to Music, and the path became /usr/local/src. Clearing the category changed it to /downloads. That matches the code: `onCategoryChanged()` sets the path on every category change without checking `use_auto_tmm`.
+
 
 **Proposed Solution**
 
-[High-level description of your fix approach, and what you are
-deliberately NOT changing.]
+In `AddTorrentParamsForm.vue`, I will make `onCategoryChanged()` leave the save path alone when the user has typed it and Automatic Torrent Management is off. The form will keep one new piece of state, a ref that records whether the user edited the save path field. The ref is set when the field reports a user change (through its `update:model-value` event) and checked at the top of the handler. When the path was not edited by the user, the handler behaves exactly as it does today, so picking a category still fills in the category's save path. When the user did edit it, changing the category or clearing it no longer replaces their path.
+
+The maintainer has not yet answered my question about the intended behavior in manual mode, so this is my assumption. I chose it because it fixes what the issue reports, a typed path being lost, and it keeps the behavior Larsluph described, where a category with a save path fills the field. If Larsluph prefers the path to never change in manual mode, the fix is a small step from this one.
+
+What I am deliberately not changing:
+
+- The behavior with Automatic Torrent Management on. The field is disabled and only shows an indicator there, so the handler keeps updating it.
+- The `use_category_paths_in_manual_mode` preference. The add dialog does not read it, and what it should do is unclear, so it is out of scope.
+- The empty-category-save-path check that PR #1999 added.
+- `ServerPathField.vue`, `addTorrents.ts`, `AddTorrentDialog.vue`, and the data sent to qBittorrent.
 
 **Implementation Plan**
 
-1. [Modify file X to do Y]
-2. [Add or change Z]
-3. [Update tests]
-
-[Record deviations here as they happen: what changed mid-build and
-why. A recorded deviation is honest work; silent drift is not.]
+1. Create a branch from master, `fix/1994-keep-typed-save-path`.
+2. Confirm that typing in `ServerPathField` makes it emit `update:model-value`, and that setting `form.save_path` from code does not. The fix relies on this, so I will check it first, in the browser in mock mode or in the test from step 4. If it is wrong, I will change the plan and record it below.
+3. In `src/components/Dialogs/AddTorrentParamsForm.vue`:
+   - add a ref, `savePathEdited`, that starts as false;
+   - listen for `@update:model-value` on the save path `ServerPathField` (lines 187-191) and set the ref to true;
+   - at the top of `onCategoryChanged()`, return early when `!form.value.use_auto_tmm && savePathEdited.value`.
+   Nothing else in the handler changes. I also need to decide when the ref goes back to false (for example when the form is reset after adding a torrent), and I will record that decision below.
+4. Add `src/components/Dialogs/AddTorrentParamsForm.spec.ts`, following the existing specs in `src/components/Core/`. It mounts the form with Vuetify and `createTestingPinia({ stubActions: false })`, loads two fake categories, and checks that:
+   - a typed path survives a category change with Automatic Torrent Management off;
+   - a typed path survives clearing the category;
+   - without typing, choosing a category still fills in its save path;
+   - with Automatic Torrent Management on, the path is still updated.
+   I will run the first two on master first and confirm they fail without the fix.
+5. Run `npm run test`, `npm run lint`, and `npm run build`. Then repeat the reproduction steps from the Analysis on the branch in mock mode (type /downloads/special, change the category to Music, then clear the category) and expect the path to stay /downloads/special both times.
+6. Save the before and after output in `test_evidence.md`, and keep each commit to one change with a message that says what it does.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: plan-check, run through Claude Code on plan.md and plan-comment.md against issue #1994. Claude also helped me draft the Analysis, Proposed Solution, and Implementation Plan, and compared three options for the fix before I chose one.
+- What it produced: The first run said reject: every check passed except diagnosis, which was unclear because no reproduction report was posted on the issue. The second run said accept, with all six required checks passing. It also flagged voice-guide breaks in my plan comment and a gap: my reproduction is quoted in prose with no command or output.
+- Difficulties: Its advice to post my report on the issue conflicts with the assignment, which says to keep it off, so I did not do that. Claude's first Analysis draft included a claim about the order in which Vue runs the category update and the handler. I had not tested it, so I removed it. The voice-guide breaks plan-check found in my comment are still open, because the comment is not going to be posted.
+- What changed: I quoted my reproduction steps and results in plan.md, made plan step 5 name the steps to re-run, replaced "he" with "Larsluph", and cut the untested sentence from the Analysis. I kept my assumption about the maintainer's intended behavior in the plan.
 
 ---
 
