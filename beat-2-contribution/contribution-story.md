@@ -62,10 +62,9 @@ I installed issue-scout over my unit 1 rubric and wrote a search strategy from m
 
 I merged my three voice guides into one, added upstream rules for claims, questions and pings, and installed a hook that checks every comment I post through Claude Code against that guide. The hook blocked my wiring test as expected, then passed my claim draft and the real post, and my guard log shows all three. I also wrote a 33-line CLAUDE.local.md for VueTorrent from one scoped orientation run and kept it out of my PR with .git/info/exclude; the run's summary was only a lead, so I confirmed the code myself before trusting it. Nothing broke: I worried my "No deadlines" rule would block my claim's "I'll post what I find once I've reproduced it", so I left the rule alone to test it, and the guard passed the claim anyway.
 
-**Unit 7: [one line on the tool work]**
+**Unit 7: Installed the ship-gate with a manifest of VueTorrent's three checks, and used plan-check and the gate to plan, build, and open my PR (2026-11-08 to 2026-11-09)**
 
-[2-4 sentences: the ship-gate and your gate manifest. What it produced
-on your real branch, what fought you, what changed because of it.]
+I wrote my manifest from VueTorrent's CI file (`npm run test`, `npm run lint`, `npm run build`), and the ship-gate passed on my branch both times, running those checks and then nine pr-precheck checks. At first my hook test showed only the ship-gate's stop message, so I ran my voice guard on its own to confirm it also stopped the command. Plan-check rejected my first plan because no reproduction report was posted on the issue, which conflicts with the assignment's instruction to keep it off, so I quoted my reproduction in plan.md and it accepted. After the first gate PASS I edited my description (version, a Changes list, an untested-RSS note, a thank-you line) and added a Deviations entry, so I ran the gate again; because it could not read the issue thread, I checked the issue for new comments and parallel PRs myself before pushing.
 
 **Unit 8: [one line on the tool work]**
 
