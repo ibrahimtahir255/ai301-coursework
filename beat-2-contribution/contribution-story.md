@@ -11,7 +11,7 @@ files and no evidence uploads are part of Assignment 5.
 **Student:** Ibrahim Tahir
 **GitHub Username:** ibrahimtahir255
 **Issue:** https://github.com/VueTorrent/VueTorrent/issues/1994
-**Pull Request:** [GitHub PR link, once opened]
+**Pull Request:** https://github.com/VueTorrent/VueTorrent/pull/3014
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -275,7 +275,7 @@ While reading the code I found that this form is also used by the RSS rule dialo
 
 ## Pull Request
 
-**PR Link:** [GitHub PR URL when opened]
+**PR Link:** https://github.com/VueTorrent/VueTorrent/pull/3014
 
 **PR Description:** [what the PR says; much of the content above
 adapts into it]
