@@ -184,10 +184,9 @@ PR #1999 added the `category.savePath.length > 0` check, so a category with an e
 
 I reproduced this on v2.36.1 (commit eba5162, master) in mock mode with `VITE_USE_MOCK_PROVIDER=true npm run dev`. With Automatic Torrent Management unchecked, category Movie gave /bin. I typed /downloads/special, changed the category to Music, and the path became /usr/local/src. Clearing the category changed it to /downloads. That matches the code: `onCategoryChanged()` sets the path on every category change without checking `use_auto_tmm`.
 
-
 **Proposed Solution**
 
-In `AddTorrentParamsForm.vue`, I will make `onCategoryChanged()` leave the save path alone when the user has typed it and Automatic Torrent Management is off. The form will keep one new piece of state, a ref that records whether the user edited the save path field. The ref is set when the field reports a user change (through its `update:model-value` event) and checked at the top of the handler. When the path was not edited by the user, the handler behaves exactly as it does today, so picking a category still fills in the category's save path. When the user did edit it, changing the category or clearing it no longer replaces their path.
+In `AddTorrentParamsForm.vue`, I will make `onCategoryChanged()` leave the save path alone when the user has typed it and Automatic Torrent Management is off. The form will keep one new piece of state, a ref that records whether the user edited the save path field. The ref is set to true when the field reports a non-empty user change (through its `update:model-value` event), and to false when the user empties the field, so an emptied path is filled in again by the next category change. The ref is checked at the top of the handler. When the path was not edited by the user, the handler behaves exactly as it does today, so picking a category still fills in the category's save path. When the user did edit it, changing the category or clearing it no longer replaces their path.
 
 The maintainer has not yet answered my question about the intended behavior in manual mode, so this is my assumption. I chose it because it fixes what the issue reports, a typed path being lost, and it keeps the behavior Larsluph described, where a category with a save path fills the field. If Larsluph prefers the path to never change in manual mode, the fix is a small step from this one.
 
@@ -204,7 +203,7 @@ What I am deliberately not changing:
 2. Confirm that typing in `ServerPathField` makes it emit `update:model-value`, and that setting `form.save_path` from code does not. The fix relies on this, so I will check it first, in the browser in mock mode or in the test from step 4. If it is wrong, I will change the plan and record it below.
 3. In `src/components/Dialogs/AddTorrentParamsForm.vue`:
    - add a ref, `savePathEdited`, that starts as false;
-   - listen for `@update:model-value` on the save path `ServerPathField` (lines 187-191) and set the ref to true;
+   - listen for `@update:model-value` on the save path `ServerPathField` (lines 187-191) and set the ref to true when the new value is not empty, and to false when it is empty;
    - at the top of `onCategoryChanged()`, return early when `!form.value.use_auto_tmm && savePathEdited.value`.
    Nothing else in the handler changes. I also need to decide when the ref goes back to false (for example when the form is reset after adding a torrent), and I will record that decision below.
 4. Add `src/components/Dialogs/AddTorrentParamsForm.spec.ts`, following the existing specs in `src/components/Core/`. It mounts the form with Vuetify and `createTestingPinia({ stubActions: false })`, loads two fake categories, and checks that:
@@ -212,9 +211,16 @@ What I am deliberately not changing:
    - a typed path survives clearing the category;
    - without typing, choosing a category still fills in its save path;
    - with Automatic Torrent Management on, the path is still updated.
+   - clearing the path and then changing the category fills in the category's save path (an emptied path counts as not edited).
    I will run the first two on master first and confirm they fail without the fix.
 5. Run `npm run test`, `npm run lint`, and `npm run build`. Then repeat the reproduction steps from the Analysis on the branch in mock mode (type /downloads/special, change the category to Music, then clear the category) and expect the path to stay /downloads/special both times.
 6. Save the before and after output in `test_evidence.md`, and keep each commit to one change with a message that says what it does.
+
+**Deviations**
+
+- 2026-11-08: Step 2's check is done. Typing in the save path field emits `update:model-value` and a value set from code does not (my first test typed into a hidden input Vuetify adds, and failed until I pointed it at the visible one). I also added a rule: an emptied path counts as not edited. Otherwise a user who clears the box and then changes the category would be left with an empty save path, which is a new behavior nobody asked for. This adds a fifth test in step 4.
+- 2026-11-08: Decided when `savePathEdited` resets (plan step 3). It needs no extra code: both dialogs that use the form are rebuilt every time they open, so the ref starts false each time. The cost is the reopen limit described in my PR: a typed path left in the dialog is shown again on reopening, but a category change replaces it.
+
 
 **Toolkit**
 
