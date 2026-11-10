@@ -246,23 +246,24 @@ What I am deliberately not changing:
 
 ## Implementation Notes
 
-[A running log, added to as you work. Date each entry. What you
-built, decisions you made when you made them, wrong turns included.]
+**2026-11-08**
 
-**[Date]**
+I installed the ship-gate and wrote my plan. My first plan-check run said reject, because there was no reproduction report posted on the issue to check my cause against. I did not post one, because the assignment says to keep it off the issue. I quoted my reproduction steps and results in plan.md instead, made the test step name the steps to re-run, and replaced "he" with the maintainer's username. The second run said accept. The maintainer has not answered my question about the intended behavior in manual mode, so I wrote my fix as an assumption in the plan.
 
-[Entry]
+Before building, I checked the plan's main assumption, that typing in the save path field emits an event and a value set from code does not. My first test failed because it typed into a hidden input that Vuetify adds, not the real text box. After I pointed it at the visible input, typing emitted the event and code-set values did not, so the plan held. I then added one rule to the plan: an emptied path counts as not edited, so the category fills it in again. That added a fifth test, and I recorded it in the plan's Deviations.
 
-**[Date]**
+**2026-11-08**
 
-[Entry]
+I wrote the spec first and ran it on the unchanged component. The two tests for my fix failed on their last assertion and the other three passed, which is what I expected. The fix is three small changes in `AddTorrentParamsForm.vue`: a `savePathEdited` flag, an early return in `onCategoryChanged()`, and a listener on the save path field. I committed the fix and then the test as two separate commits, so no commit has a failing test. The agent had added a co-author trailer to my first commit message, so I amended the message and made the test commit myself.
+
+While reading the code I found that this form is also used by the RSS rule dialog, so the fix applies there too, with no extra files changed. I also found two limits I am not fixing in this PR. If I type a path, close the dialog without adding, and reopen it, a category change still replaces the typed path. And if I type a path, turn Automatic Torrent Management on and pick a category, then turn it off and pick another, the path set by the code is kept. The mock backend gives each category a random save path on every page load, and `npm run build` hung in the agent's sandbox, so I ran it in my own terminal.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude, in a chat session. It kept a running list of what happened during the build, and I used it to write the dated entries above.
+- What it produced: The entries for the plan-check results, the assumption check, the cleared-field rule, the commits, the RSS dialog finding, and the two known limits.
+- Difficulties: The entries were written after the work, so I checked details like commit hashes and test counts against my terminal and test_evidence.md.
+- What changed: I edited the entries into my own words. Next time I would add an entry as each step finishes.
 
 ---
 
