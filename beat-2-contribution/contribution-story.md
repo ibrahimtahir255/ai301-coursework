@@ -277,25 +277,20 @@ While reading the code I found that this form is also used by the RSS rule dialo
 
 **PR Link:** https://github.com/VueTorrent/VueTorrent/pull/3014
 
-**PR Description:** [what the PR says; much of the content above
-adapts into it]
+**PR Description:** Fixes #1994. In the Add Torrent dialog with Automatic Torrent Management off, a save path the user typed was replaced when they changed or cleared the category. The form now remembers whether the user edited the save path field, so a typed path is kept, and the category still fills in its path when nothing was typed. An emptied path counts as not edited. Behavior with Automatic Torrent Management on is unchanged. The PR has two commits, the fix and five tests. The tests fail on master (the typed path was overwritten) and pass on the branch, and the full suite (445 tests), lint, and build pass. The maintainer has not yet confirmed the intended behavior in manual mode, so the PR says this is my assumption and asks them to redirect me if they want it different. The form is also used by the RSS rule dialog, so the fix applies there too, but I did not test it. Two known limits are noted in the PR.
 
 **Maintainer Feedback:**
 
-- [Date]: [feedback received, or "none yet"; silence is a normal
-  state and costs you nothing]
-- [Date]: [how you addressed it]
+- 2026-11-09: none yet. Larsluph and WDaan were requested as reviewers, and a bot (CodeRabbit) started a review with no findings.
 
-**Status:** [Awaiting review / Iterating / Merged / Closed. The
-status is a fact you record, never a grade: the PR is graded as
-opened.]
+**Status:** Awaiting review
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: The ship-gate, with my manifest (tests, lint, build) and my pr-precheck. I ran it on my branch with my PR title and pr_draft.md, then opened the PR through Claude Code.
+- What it produced: PASS both times. It ran my three repo checks and then nine pr-precheck checks, including scope-match, plan-delivered, and before-after-proof. It also listed voice-guide notes and two gaps: it could not read the issue thread, and it could not check for a parallel PR.
+- Difficulties: Because it could not read the thread, I checked the issue myself for new comments, linked PRs, and assignees before pushing. The voice-guide notes made me edit my description after the first PASS, so I had to run the gate a second time.
+- What changed: I added the version and OS, a Changes section with one bullet per change, a line saying I had not tested the RSS dialog, and a closing thank-you line to pr_draft.md. I also added a Deviations entry to my plan for the reset decision.
 
 ---
 
