@@ -227,17 +227,20 @@ What I am deliberately not changing:
 
 ## Testing Strategy
 
-[What observable checks prove the fix: your reproduction steps re-run
-against the built change (before and after), and the repo's own test
-suite or checks with the outcome shown. "Tests pass" with nothing
-observable named is not a strategy.]
+**Reproduction, before and after.** On master (commit eba51626, v2.36.1, mock mode, Automatic Torrent Management off), typing `/downloads/special` and then changing the category to Music replaced it with Music's saved path, and clearing the category replaced it with the default path (`/downloads`). On my branch (commit ea052025), the same steps leave `/downloads/special` in place both times. With nothing typed, picking a category still fills in that category's saved path, and with Automatic Torrent Management on, the path still follows the category. The mock backend gives each category a random save path on every page load, so I compared against each category's own path instead of fixed values.
+
+**New tests.** I added `src/components/Dialogs/AddTorrentParamsForm.spec.ts` with five tests. On the unchanged component, the two that cover my fix failed (a typed path was overwritten after a category change and after clearing the category), and the three that guard existing behavior passed. With the fix, all five pass.
+
+**Repo checks.** `npm run test` passes with 32 files and 445 tests (master had 31 files and 440, and the difference is my new spec). `npm run lint` is clean, and `npm run build` succeeds, including the `vue-tsc` type check. I will include the before and after output in my PR description.
+
+**Known limit.** If a user types a path, closes the dialog without adding a torrent, and reopens it, the typed path is still shown but a category change replaces it, as before the fix.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: vitest with @vue/test-utils (the project's own test setup). An AI coding agent in my IDE wrote the spec one step at a time, and I approved each file and each commit. Claude reviewed the agent's proposals and its outputs with me before I approved them.
+- What it produced: A five-test spec for the Add Torrent form. Run on the unchanged component, the two tests for my fix failed on their last assertion (the typed path was replaced by the category's path, and then by the default path), and the other three passed. With the fix, all five pass, and the full suite went from 440 to 445 tests.
+- Difficulties: My first throwaway check typed into the wrong input, a hidden one that Vuetify adds, so it failed even though the plan was right. `npm run build` also hung in the agent's sandbox, and the mock backend gives categories random save paths, so I could not compare against fixed values.
+- What changed: I pointed the tests at the visible input with `input:not([type="hidden"])`, ran the build myself in my own terminal, and compared each result against the category's own path. I also kept the spec uncommitted until the fix was in, so no commit in history has a failing test.
 
 ---
 
