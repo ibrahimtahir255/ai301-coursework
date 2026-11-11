@@ -66,10 +66,9 @@ I merged my three voice guides into one, added upstream rules for claims, questi
 
 I wrote my manifest from VueTorrent's CI file (`npm run test`, `npm run lint`, `npm run build`), and the ship-gate passed on my branch both times, running those checks and then nine pr-precheck checks. At first my hook test showed only the ship-gate's stop message, so I ran my voice guard on its own to confirm it also stopped the command. Plan-check rejected my first plan because no reproduction report was posted on the issue, which conflicts with the assignment's instruction to keep it off, so I quoted my reproduction in plan.md and it accepted. After the first gate PASS I edited my description (version, a Changes list, an untested-RSS note, a thank-you line) and added a Deviations entry, so I ran the gate again; because it could not read the issue thread, I checked the issue for new comments and parallel PRs myself before pushing.
 
-**Unit 8: [one line on the tool work]**
+**Unit 8: Wrote a playbook from VueTorrent's real review times, ran the PR monitor on my PR, and agreed with its wait draft (2026-11-10)**
 
-[2-4 sentences: the PR-monitor and your playbook. What it read, what it
-drafted, what you did with the draft.]
+I installed the PR monitor and wrote my playbook from VueTorrent's real data: CONTRIBUTING.md states no wait, and five recent outside-contributor PRs waited 1, 1, 1, 6 and 2 days for a first maintainer response, so my nudge threshold is 7 days. The monitor's state check reported that feedback was in, which made me re-read my PR page and find a finding from CodeRabbit that my earlier note ("no findings") had missed. The full run then drafted "wait, do not reply", and I did not post anything, because no maintainer had commented and the finding is a behavior question that is Larsluph's to decide. The draft got two things wrong. It said it could not tell whether the save path box reacts when code (not a person) sets the path, but my test in the plan had already shown it does not. It also said my PR already lists the bot's case as a known limit, but my PR lists a different case. Because the monitor counts any comment that is not mine, including the bot's, I wrote my quiet-day rule to count only human maintainers and to check the thread myself, and I added to the Maintainer Feedback lines in my story.
 
 ---
 
@@ -281,6 +280,8 @@ While reading the code I found that this form is also used by the RSS rule dialo
 **Maintainer Feedback:**
 
 - 2026-11-09: none yet. Larsluph and WDaan were requested as reviewers, and a bot (CodeRabbit) started a review with no findings.
+- 2026-11-10: No maintainer has responded yet. CodeRabbit, a review bot, posted one finding and a matching Linked Issues warning: if a category sets the path while Automatic Torrent Management is on, and I then turn it off and change the category, the path is replaced. The issue also says that path should stay, and my fix only protects a path I typed.
+- 2026-11-10: I did not reply or change the code. My PR already says the manual-mode behavior is my assumption and asks the maintainers to redirect me, so I am waiting for Larsluph or WDaan. My PR monitor drafted "wait" and I agreed.
 
 **Status:** Awaiting review
 
