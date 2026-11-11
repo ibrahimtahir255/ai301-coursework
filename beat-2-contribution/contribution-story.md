@@ -262,6 +262,14 @@ I wrote the spec first and ran it on the unchanged component. The two tests for 
 
 While reading the code I found that this form is also used by the RSS rule dialog, so the fix applies there too, with no extra files changed. I also found two limits I am not fixing in this PR. If I type a path, close the dialog without adding, and reopen it, a category change still replaces the typed path. And if I type a path, turn Automatic Torrent Management on and pick a category, then turn it off and pick another, the path set by the code is kept. The mock backend gives each category a random save path on every page load, and `npm run build` hung in the agent's sandbox, so I ran it in my own terminal.
 
+**2026-11-09**
+
+I ran the ship-gate on my branch and it passed. Then I edited my PR description (version and OS, a Changes list, a note that I had not tested the RSS dialog, and a thank-you line) and ran the gate a second time, which also passed. The gate could not read the issue thread, so I checked the issue myself for new comments, assignees, and other PRs before pushing. I pushed the branch and opened PR #3014 through Claude Code. Larsluph and WDaan were requested as reviewers, and CodeRabbit started a review.
+
+**2026-11-10**
+
+I installed the PR monitor and wrote my playbook from VueTorrent's real review times: CONTRIBUTING.md states no wait, and five recent outside-contributor PRs waited 1, 1, 1, 6 and 2 days for a first maintainer response, so I set a 7-day nudge threshold. The monitor reported that feedback was in. When I re-read my PR page, I found a CodeRabbit finding I had missed: if a category fills in the path while Automatic Torrent Management is on, and I then turn it off and change the category, the path is replaced. The issue also says that path should stay, and my fix only protects a path I typed. I did not change the code, because this is the same open question about manual mode that I asked Larsluph, and I did not reply, because no maintainer has commented. The monitor drafted "wait" and I agreed. I also corrected the Maintainer Feedback lines in my story, which had said the bot found nothing.
+
 **Toolkit**
 
 - Tool: Claude, in a chat session. It kept a running list of what happened during the build, and I used it to write the dated entries above.
