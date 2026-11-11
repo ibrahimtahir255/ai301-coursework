@@ -320,10 +320,10 @@ I would copy the issue's exact wording into my plan before building. I wrote tha
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
+- [VueTorrent issue #1994](https://github.com/VueTorrent/VueTorrent/issues/1994): the bug report and Larsluph's reply that manual mode assumes a category's path is wanted. It showed me what the bug was and why the intended behavior is still open.
+- [VueTorrent PR #1999](https://github.com/VueTorrent/VueTorrent/pull/1999): the earlier fix for an empty category save path. It showed me which part of the issue was already fixed, so I could scope mine to the rest.
+- [VueTorrent CONTRIBUTING.md](https://github.com/VueTorrent/VueTorrent/blob/master/.github/CONTRIBUTING.md): the contribution steps (branch from master, one topic per PR, run lint and tests). It also showed me that the project states no review wait, which mattered for my playbook.
+- [VueTorrent test workflow](https://github.com/VueTorrent/VueTorrent/blob/master/.github/workflows/test.yml): where I took the three checks (test, lint, build) for my ship-gate manifest.
+- [CodeRabbit's review on my PR #3014](https://github.com/VueTorrent/VueTorrent/pull/3014): it pointed out the case my fix did not cover, the path a category sets before Automatic Torrent Management is turned off.
+- Recent merged PRs from outside contributors, such as [#2975](https://github.com/VueTorrent/VueTorrent/pull/2975) and [#2968](https://github.com/VueTorrent/VueTorrent/pull/2968): how long they waited for a first maintainer response, which set my 7-day nudge threshold.
 
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
