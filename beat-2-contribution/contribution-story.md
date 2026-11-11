@@ -118,6 +118,7 @@ On v2.36.1 (commit eba5162), using the mock backend: category Movie gives /bin. 
 - What it produced: A draft of Problem Description, Expected Behavior, Current Behavior, and Affected Components. It confirmed that onCategoryChanged() never reads use_auto_tmm, and it pointed out that the maintainer's view in the thread differs from the reporter's.
 - Difficulties: Its page fetch of the issue did not show comment dates or my claim comment, so it could not tell whether the maintainer had answered my question. I checked the thread myself, and he has not replied yet.
 - What changed: I edited Claude's draft where it was unclear and checked that it was accurate, direct, and on topic. I reworded Expected Behavior to say plainly that the maintainer's view is still an open question.
+  
 ---
 
 ## Reproduction Process
@@ -287,7 +288,7 @@ I installed the PR monitor and wrote my playbook from VueTorrent's real review t
 
 **Maintainer Feedback:**
 
-- 2026-11-09: none yet. Larsluph and WDaan were requested as reviewers, and a bot (CodeRabbit) started a review with no findings.
+- 2026-11-09: none yet. Larsluph and WDaan were requested as reviewers, and a bot (CodeRabbit) started a review.
 - 2026-11-10: No maintainer has responded yet. CodeRabbit, a review bot, posted one finding and a matching Linked Issues warning: if a category sets the path while Automatic Torrent Management is on, and I then turn it off and change the category, the path is replaced. The issue also says that path should stay, and my fix only protects a path I typed.
 - 2026-11-10: I did not reply or change the code. My PR already says the manual-mode behavior is my assumption and asks the maintainers to redirect me, so I am waiting for Larsluph or WDaan. My PR monitor drafted "wait" and I agreed.
 
