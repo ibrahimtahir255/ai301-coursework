@@ -306,16 +306,15 @@ I installed the PR monitor and wrote my playbook from VueTorrent's real review t
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+I learned to find where a bug lives in a code base I had not seen: I followed the Add Torrent dialog to `onCategoryChanged()` in `AddTorrentParamsForm.vue` and confirmed the cause by reproducing the bug in the app's mock-data mode. I learned to write component tests with vitest and @vue/test-utils, and to write them first: two of my five tests failed on the unchanged code and all five passed with the fix. I also learned two things about how Vue and Vuetify behave: typing in a field emits `update:model-value` but a value set from code does not, which is the idea my fix rests on, and Vuetify adds a hidden input, so a test has to select the visible one. Finally, I ran the project's own checks (test, lint, build) and kept the fix and its tests in two separate commits.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+The hardest part was that the maintainer had not said what manual mode should do, and my scout had rejected the issue because of the earlier merged PR #1999. I chose it anyway, wrote my fix as a stated assumption in the plan and in the PR, and asked the maintainers to redirect me. A smaller problem was that my first test typed into a hidden input and failed even though the plan was right; I pointed it at the visible input and the plan held. Plan-check rejected my first plan because no reproduction was posted on the issue, which conflicts with the assignment, so I quoted the reproduction in plan.md instead. 
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+I would copy the issue's exact wording into my plan before building. I wrote that the issue wants a typed path kept, but it also says a path set by a category should stay, and I only noticed that when CodeRabbit pointed it out. I would also ask the maintainer's question earlier and wait for an answer before writing code, if the timing allows. I would write each Implementation Notes entry as I finish a step, not afterward, and I would take before-fix screenshots when I reproduce the bug, since I skipped them for lack of time. Last, I would re-read my PR page itself each time instead of relying on an earlier note: my note said the bot found nothing, and it was wrong.
 
 ---
 
