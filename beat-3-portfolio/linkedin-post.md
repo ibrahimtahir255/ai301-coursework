@@ -9,4 +9,5 @@ So I added a filter that skips issues GitHub already links to a pull request (so
 The tool still hasn’t surfaced an issue I could use, and I haven’t tested my latest changes in a full run. But building it showed me how many “good first issues” are already spoken for.
 
 Write-up with the details: https://github.com/ibrahimtahir255/ai301-coursework/blob/main/beat-3-portfolio/technical-writeup.md
+
 #opensource #softwaredevelopment #learning
